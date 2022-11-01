@@ -41,7 +41,8 @@ client.init(
 );
 
 // The value of role can be "host" or "audience".
-let role='host'
+let role = getUrlVars()["role"];
+// let role='host'
 client.setClientRole(role);
 
 // Join a channel
@@ -51,6 +52,15 @@ client.join(
   null,
   (uid) => {
     // Create a local stream
+    if (role == "host") {
+      createLocalStream();
+    }
+  },
+  handleError
+);
+// Create a local stream
+function createLocalStream(){ 
+  // Create a local stream
     let localStream = AgoraRTC.createStream({
       audio: true,
       video: true,
@@ -62,10 +72,7 @@ client.join(
       // Publish the local stream
       client.publish(localStream, handleError);
     }, handleError);
-  },
-  handleError
-);
-
+}
 
 // Subscribe to the remote stream when it is published
 client.on("stream-added", function(evt){
@@ -93,3 +100,20 @@ client.on("peer-leave", function(evt){
     stream.close();
     removeVideoStream(streamId);
 });
+
+
+//get url params
+
+
+
+
+function getUrlVars() {
+  var vars = {};
+  var parts = window.location.href.replace(
+    /[?&]+([^=&]+)=([^&]*)/gi,
+    function (m, key, value) {
+      vars[key] = value;
+    }
+  );
+  return vars;
+}
